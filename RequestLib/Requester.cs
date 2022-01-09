@@ -19,7 +19,7 @@ namespace RequestLib
 				new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
 			client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
-			var byteArray = Encoding.ASCII.GetBytes("Barbarisko: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");
+			var byteArray = Encoding.ASCII.GetBytes("Barbarisko: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");
 
 			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 		}

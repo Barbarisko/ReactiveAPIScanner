@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ReactiveClient": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "PYTHON_PATH": "%appdata%\\..\\Local\\Programs\\Python\\Python39\\python"
+      }
+    }
+  }
+}
