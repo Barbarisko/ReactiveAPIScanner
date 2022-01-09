@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace RequestLib
 {
-	class FileContentGetter : Requester
+	public class FileContentGetter : Requester
 	{
 		public FileContentGetter() : base()
 		{
 		}
 
-		private async Task<string> GetFileContent(Path path)
+		public async Task<string> GetFileContent(Path path)
 		{
 			var stringTask = client.GetStringAsync("https://raw.githubusercontent.com/" + path.full_repo_name + "/master/" + path.path_to_file);
 

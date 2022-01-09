@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class IntegerConsumer : IObserver<string>
+    public class FileConsumer : IObserver<RequestLib.Path>
     {
-        readonly int validDivider;
-        //the costructor asks for a divider
-        public IntegerConsumer(int validDivider)
+        RequestLib.FileContentGetter fileContentGetter;
+        APIKeyFinder.PythonCaller fileProcessor;
+        public FileConsumer()
         {
-            this.validDivider = validDivider;
+            fileContentGetter = new RequestLib.FileContentGetter();
+            fileProcessor = new APIKeyFinder.PythonCaller();
         }
 
         private bool finished = false;
@@ -32,16 +33,38 @@ namespace ReactiveClient
             Console.WriteLine("{0}: {1}", GetHashCode(), error.Message);
         }
 
-        public void OnNext(string value)
+        public async void OnNext(RequestLib.Path file)
         {
             if (finished)
                 OnError(new Exception("This consumer finished its lifecycle"));
 
-            //the simple business logic is made by checking divider result
-            else if (value != null)
-                Console.WriteLine("{0}: {1} divisible by {2}", GetHashCode(), value, validDivider);
-        }
-        //Observable able to parse strings from the Console
-        //and route numeric messages to all subscribers    
+            List<APIKeyFinder.ScanResult> result;
+            try
+            {
+                string text = await fileContentGetter.GetFileContent(file);
+                result = fileProcessor.Scan(text);
+            }
+            catch(Exception e)
+            {
+                OnError(e);
+                return;
+            }
+
+            if (result.Count() < 0)
+            {
+                Console.WriteLine("Checked file: " + file.name + " No Keys found!");
+
+            }
+            else
+            {
+                Console.WriteLine("Checked file: " + file.name + " Found " + result.Count() + " Keys");
+                foreach(var key in result)
+                {
+                    Console.WriteLine(key.ToString());
+                }
+            }
+
+
+        }    
     }
 }

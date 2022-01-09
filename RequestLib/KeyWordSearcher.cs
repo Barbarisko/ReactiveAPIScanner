@@ -35,7 +35,7 @@ namespace RequestLib
 
             foreach (var m in results.items)
             {
-                resList.Add(new Path(m.repository.full_name, m.path));
+                resList.Add(new Path(m.repository.full_name, m.path, m.name));
             }
 
             return resList;

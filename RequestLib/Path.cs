@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace RequestLib
 {
-	struct Path
+	public struct Path
 	{
-		public string full_repo_name, path_to_file;
+		public string full_repo_name, path_to_file, name;
 
-		public Path(string full_name, string path)
+		public Path(string full_name, string path, string name)
 		{
 			full_repo_name = full_name;
 			path_to_file = path;
+			this.name = name;
 		}
 	}
 
