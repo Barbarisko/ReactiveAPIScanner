@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestReactive
+namespace ReactiveClient
 {
     class Program
     {
@@ -20,6 +20,3 @@ namespace TestReactive
         }
     }
 }
-
-
-
