@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIKeyFinder", "APIKeyFinde
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveClient", "ReactiveClient\ReactiveClient.csproj", "{14C89D0C-E485-41EF-842C-5082F317DE7A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RequestLib", "RequestLib\RequestLib.csproj", "{2E4670CE-1E32-4D4C-893F-6644FAF6E038}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{14C89D0C-E485-41EF-842C-5082F317DE7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14C89D0C-E485-41EF-842C-5082F317DE7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14C89D0C-E485-41EF-842C-5082F317DE7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E4670CE-1E32-4D4C-893F-6644FAF6E038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E4670CE-1E32-4D4C-893F-6644FAF6E038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E4670CE-1E32-4D4C-893F-6644FAF6E038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E4670CE-1E32-4D4C-893F-6644FAF6E038}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
