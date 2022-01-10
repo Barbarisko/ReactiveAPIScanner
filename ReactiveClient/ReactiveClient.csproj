@@ -10,4 +10,8 @@
     <ProjectReference Include="..\RequestLib\RequestLib.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y $(SolutionDir)\APIKeyFinder\key_scanner.py  $(ProjectDir)$(OutDir)" />
+  </Target>
+
 </Project>

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class ApiKeyProducer : IObservable<string>, IDisposable
+    public class ApiKeyProducer : IObservable<RequestLib.File>, IDisposable
     {
         //the subscriber list
-        private readonly List<IObserver<string>> subscriberList = new List<IObserver<string>>();
+        private readonly List<IObserver<RequestLib.File>> subscriberList = new List<IObserver<RequestLib.File>>();
 
         //the cancellation token source for starting stopping
         //inner observable working thread
@@ -29,7 +29,7 @@ namespace ReactiveClient
             workerTask = Task.Factory.StartNew(OnInnerWorker, cancellationToken);
         }
         //add another observer to the subscriber list
-        public IDisposable Subscribe(IObserver<string> observer)
+        public IDisposable Subscribe(IObserver<RequestLib.File> observer)
         {
             if (subscriberList.Contains(observer))
                 throw new ArgumentException("The observer is already subscribed to this observable");
@@ -43,12 +43,14 @@ namespace ReactiveClient
         //this code executes the observable infinite loop
         //and routes messages to all observers on the valid
         //message handler
-        private void OnInnerWorker()
+        private async void OnInnerWorker()
         {
+            var fileContentGetter = new RequestLib.FileContentGetter();
+            var g = new RequestLib.KeyWordSearcher();
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 var input = Console.ReadLine();
-                int value;
 
                 foreach (var observer in subscriberList)
                     if (string.IsNullOrEmpty(input))
@@ -58,11 +60,16 @@ namespace ReactiveClient
                         cancellationSource.Cancel();
                         break;
                     }
-
-                    else if (!int.TryParse(input, out value))
-                        observer.OnError(new FormatException("Unable to parse given value"));
                     else
-                        observer.OnNext(value.ToString());
+                    {
+                        var res = await g.SearchRepositories(input);
+                        var resFiles = g.ParseSearchResponce(res);
+                        var file = resFiles[0];
+                        file.text = await fileContentGetter.GetFileContent(file);
+                        observer.OnNext(file);
+                        //foreach(var f in resFiles)
+                        //    observer.OnNext(f);
+                    }
             }
             cancellationToken.ThrowIfCancellationRequested();
         }

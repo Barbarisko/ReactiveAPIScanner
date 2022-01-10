@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class FileConsumer : IObserver<RequestLib.Path>
+    public class FileConsumer : IObserver<RequestLib.File>
     {
-        RequestLib.FileContentGetter fileContentGetter;
         APIKeyFinder.PythonCaller fileProcessor;
         public FileConsumer()
         {
-            fileContentGetter = new RequestLib.FileContentGetter();
             fileProcessor = new APIKeyFinder.PythonCaller();
         }
 
@@ -33,7 +31,7 @@ namespace ReactiveClient
             Console.WriteLine("{0}: {1}", GetHashCode(), error.Message);
         }
 
-        public async void OnNext(RequestLib.Path file)
+        public void OnNext(RequestLib.File file)
         {
             if (finished)
                 OnError(new Exception("This consumer finished its lifecycle"));
@@ -41,8 +39,7 @@ namespace ReactiveClient
             List<APIKeyFinder.ScanResult> result;
             try
             {
-                string text = await fileContentGetter.GetFileContent(file);
-                result = fileProcessor.Scan(text);
+                result = fileProcessor.Scan(file.text);
             }
             catch(Exception e)
             {
@@ -50,10 +47,9 @@ namespace ReactiveClient
                 return;
             }
 
-            if (result.Count() < 0)
+            if (result.Count() <= 0)
             {
                 Console.WriteLine("Checked file: " + file.name + " No Keys found!");
-
             }
             else
             {
@@ -63,8 +59,6 @@ namespace ReactiveClient
                     Console.WriteLine(key.ToString());
                 }
             }
-
-
         }    
     }
 }
