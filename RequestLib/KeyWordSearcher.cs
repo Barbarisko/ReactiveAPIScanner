@@ -19,7 +19,7 @@ namespace RequestLib
         
         private async Task<string> SearchRepositories(string search_keyword)
         {
-            var query_string = string.Format("https://api.github.com/search/code?q={0}", search_keyword);
+            var query_string = string.Format("https://api.github.com/search/code?q={0}&s=indexed&o=desc", search_keyword);
             Console.WriteLine(query_string);
 
             var stringTask = client.GetStringAsync(query_string);

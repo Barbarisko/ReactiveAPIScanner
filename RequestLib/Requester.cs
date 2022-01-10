@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,7 +20,9 @@ namespace RequestLib
 				new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
 			client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
-			var byteArray = Encoding.ASCII.GetBytes("Barbarisko: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");
+			var token = File.ReadAllText(@".\token.txt");
+
+			var byteArray = Encoding.ASCII.GetBytes("Barbarisko:" + token);
 
 			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 		}
