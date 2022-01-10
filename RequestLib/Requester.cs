@@ -20,7 +20,7 @@ namespace RequestLib
 				new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
 			client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
-			var token = File.ReadAllText(@".\token.txt");
+			var token = System.IO.File.ReadAllText(@".\token.txt");
 
 			var byteArray = Encoding.ASCII.GetBytes("Barbarisko:" + token);
 
