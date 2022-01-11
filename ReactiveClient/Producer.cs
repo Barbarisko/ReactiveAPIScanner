@@ -80,7 +80,7 @@ namespace ReactiveClient
                     }
                     cancellationToken.ThrowIfCancellationRequested();
                 }
-                catch (Exception e)
+                catch (OperationCanceledException e)
                 {
                     Console.WriteLine($"Task ended, no more files to search.");
 
