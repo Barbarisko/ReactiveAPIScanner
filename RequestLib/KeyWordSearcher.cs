@@ -12,6 +12,7 @@ namespace RequestLib
 {
     public class KeyWordSearcher : Requester
     {
+
         public KeyWordSearcher() : base()
         {
         }

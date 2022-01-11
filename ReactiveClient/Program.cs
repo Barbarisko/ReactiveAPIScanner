@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
     class Program
     {
         //To complete the example, here there is the program Main:
-        static void Main(string[] args)
+        static async Task  Main(string[] args)
         {
             //this is the message observable responsible of producing messages
             using (var observer = new ApiKeyProducer())

@@ -47,31 +47,48 @@ namespace ReactiveClient
         {
             var fileContentGetter = new RequestLib.FileContentGetter();
             var g = new RequestLib.KeyWordSearcher();
-
-            while (!cancellationToken.IsCancellationRequested)
+            while (true)
             {
-                var input = Console.ReadLine();
 
-                foreach (var observer in subscriberList)
-                    if (string.IsNullOrEmpty(input))
-                        break;
-                    else if (input.Equals("EXIT"))
-                    {
-                        cancellationSource.Cancel();
-                        break;
+                try
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    { 
+                        var input = Console.ReadLine();
+
+                        foreach (var observer in subscriberList)
+                            if (string.IsNullOrEmpty(input))
+                                break;
+                            else if (input.Equals("EXIT"))
+                            {
+                                cancellationSource.Cancel();
+                                break;
+                            }
+                            else
+                            {
+                                var res = await g.SearchRepositories(input);
+                                var resFiles = g.ParseSearchResponce(res);
+                                //var file = resFiles[0];
+                                //file.text = await fileContentGetter.GetFileContent(file);
+                                //observer.OnNext(file);
+                                foreach (var a in resFiles)
+                                {
+                                    a.text = await fileContentGetter.GetFileContent(a);
+                                    observer.OnNext(a);
+                                }
+                            }
                     }
-                    else
-                    {
-                        var res = await g.SearchRepositories(input);
-                        var resFiles = g.ParseSearchResponce(res);
-                        var file = resFiles[0];
-                        file.text = await fileContentGetter.GetFileContent(file);
-                        observer.OnNext(file);
-                        //foreach(var f in resFiles)
-                        //    observer.OnNext(f);
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Task ended, no more files to search.");
+
+                    Console.ReadKey();
+                }
             }
-            cancellationToken.ThrowIfCancellationRequested();
+            
+            
         }
 
         //cancel main task and ack all observers
