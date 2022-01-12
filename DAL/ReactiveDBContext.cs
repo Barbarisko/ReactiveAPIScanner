@@ -10,6 +10,7 @@ namespace DAL
     public class ReactiveDBContext : DbContext
     { 
         public DbSet<File> Files { get; set; }
+        public DbSet<ExtensionEntry> ExtensionEntries { get; set; }
         public DbSet<SearchResults> Results { get; set; }
         public DbSet<Key> Keys { get; set; }
 

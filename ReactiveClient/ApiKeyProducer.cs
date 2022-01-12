@@ -22,6 +22,7 @@ namespace ReactiveClient
 
         //the running task that runs the inner running thread
         private readonly Task workerTask;
+        StatisticsUtils statistics; 
 
         ReactiveDBContext context;
 
@@ -31,6 +32,7 @@ namespace ReactiveClient
             cancellationToken = cancellationSource.Token;
             workerTask = Task.Factory.StartNew(OnInnerWorker, cancellationToken);
             this.context = context;
+            statistics = StatisticsUtils.getInstance();
         }
         //add another observer to the subscriber list
         public IDisposable Subscribe(IObserver<File> observer)
@@ -53,15 +55,27 @@ namespace ReactiveClient
             var fileContentGetter = new RequestLib.FileContentGetter();
             var fileComparer = new FileComparer(context);
             var g = new RequestLib.KeyWordSearcher();
-            while (true)
-            {
-
+            //while (true)
+            //{
                 try
                 {
                     while (!cancellationToken.IsCancellationRequested)
-                    { 
+                    {
+                        Console.WriteLine("Please specify the keyword for search: ");
                         var input = Console.ReadLine();
 
+                    foreach (var observer in subscriberList)
+                        if (string.IsNullOrEmpty(input))
+                            break;
+                        else if (input.Equals("EXIT"))
+                        {
+                            cancellationSource.Cancel();
+                            break;
+                        }
+                        else
+                        {
+                            var res = await g.SearchRepositories(input);
+                            var resFiles = g.ParseSearchResponce(res);
                         foreach (var observer in subscriberList)
                             if (string.IsNullOrEmpty(input))
                                 break;
@@ -75,6 +89,16 @@ namespace ReactiveClient
                                 var res = await g.SearchRepositories(input);
                                 var resFiles = g.ParseSearchResponce(input, res);
 
+                            foreach (var a in resFiles)
+                            {
+                                a.text = await fileContentGetter.GetFileContent(a);
+                                observer.OnNext(a);
+                            }
+
+                            statistics.PrintLanguageStats(context);
+
+                        }
+                }
                                 foreach (var a in resFiles)
                                 {
                                     a.text = await fileContentGetter.GetFileContent(a);
@@ -105,9 +129,16 @@ namespace ReactiveClient
                 catch (OperationCanceledException)
                 {
                     Console.WriteLine($"Task ended, no more files to search.");
-
                     Console.ReadKey();
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"\n{e.Message}");
+                    Console.ReadKey();
+                }
+            //}
+            
+            
             }
             
             

@@ -1,21 +1,25 @@
 ﻿using DAL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class FileConsumer : IObserver<File>
+    public class FileConsumer : IObserver<DAL.File>
     {
         APIKeyFinder.PythonCaller fileProcessor;
         ReactiveDBContext context;
+        StatisticsUtils statistics; 
+
 
         public FileConsumer(ReactiveDBContext context)
         {
             fileProcessor = new APIKeyFinder.PythonCaller();
             this.context = context;
+            statistics = StatisticsUtils.getInstance();
         }
 
         private bool finished = false;
@@ -26,6 +30,7 @@ namespace ReactiveClient
             else
             {
                 finished = true;
+                statistics.PrintLanguageStats(context);
                 Console.WriteLine("{0}: END", GetHashCode());
             }
         }
@@ -35,7 +40,7 @@ namespace ReactiveClient
             Console.WriteLine("{0}: {1}", GetHashCode(), error.Message);
         }
 
-        public void OnNext(File file)
+        public void OnNext(DAL.File file)
         {
             if (finished)
                 OnError(new Exception("This consumer finished its lifecycle"));
@@ -61,6 +66,11 @@ namespace ReactiveClient
                 fileToUpdate.containsKey = true;
                 context.SaveChanges();
 
+                ///// part for stats
+                var extension = statistics.GetFileLanguage(file.name);
+                statistics.AddLanguage(extension, context);
+                ////////
+
                 Console.WriteLine("Checked file: " + file.name + " Found " + result.Count() + " Keys");
 
                 List<Key> results = new List<Key>();
@@ -76,6 +86,6 @@ namespace ReactiveClient
                     SearchResult = new List<Key>(results), KeyWord = file.keyword });
                 context.SaveChanges();
             }
-        }    
+        }
     }
 }
