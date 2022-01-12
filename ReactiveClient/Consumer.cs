@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class FileConsumer : IObserver<File>
+    public class FileConsumer : IObserver<DAL.File>
     {
         APIKeyFinder.PythonCaller fileProcessor;
         ReactiveDBContext context;
-        public FileConsumer(ReactiveDBContext context)
         StatisticsUtils statistics; 
-        public FileConsumer()
+
+        public FileConsumer(ReactiveDBContext context)
         {
             fileProcessor = new APIKeyFinder.PythonCaller();
             this.context = context;
@@ -29,7 +29,7 @@ namespace ReactiveClient
             else
             {
                 finished = true;
-                statistics.PrintLanguageStats();
+                statistics.PrintLanguageStats(context);
                 Console.WriteLine("{0}: END", GetHashCode());
             }
         }
@@ -39,7 +39,7 @@ namespace ReactiveClient
             Console.WriteLine("{0}: {1}", GetHashCode(), error.Message);
         }
 
-        public void OnNext(File file)
+        public void OnNext(DAL.File file)
         {
             if (finished)
                 OnError(new Exception("This consumer finished its lifecycle"));
@@ -62,18 +62,20 @@ namespace ReactiveClient
             else
             {
                 file.containsKey = true;
-
                 context.Files.Add(file);
                 context.SaveChanges();
 
-                statistics.GetFileLanguageStats(file.name);
+                ///// part for stats
+                var extension = statistics.GetFileLanguage(file.name);
+                statistics.AddLanguage(extension, context);
+                ////////
+
                 Console.WriteLine("Checked file: " + file.name + " Found " + result.Count() + " Keys");
 
                 foreach (var key in result)
                 {
                     Console.WriteLine(key.ToString());
                 }
-
             }
         }
     }

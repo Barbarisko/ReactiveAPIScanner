@@ -62,27 +62,26 @@ namespace ReactiveClient
                         Console.WriteLine("Please specify the keyword for search: ");
                         var input = Console.ReadLine();
 
-                        foreach (var observer in subscriberList)
-                            if (string.IsNullOrEmpty(input))
-                                break;
-                            else if (input.Equals("EXIT"))
+                    foreach (var observer in subscriberList)
+                        if (string.IsNullOrEmpty(input))
+                            break;
+                        else if (input.Equals("EXIT"))
+                        {
+                            cancellationSource.Cancel();
+                            break;
+                        }
+                        else
+                        {
+                            var res = await g.SearchRepositories(input);
+                            var resFiles = g.ParseSearchResponce(res);
+
+                            foreach (var a in resFiles)
                             {
-                                cancellationSource.Cancel();
-                                break;
+                                a.text = await fileContentGetter.GetFileContent(a);
+                                observer.OnNext(a);
                             }
-                            else
-                            {
-                                var res = await g.SearchRepositories(input);
-                                var resFiles = g.ParseSearchResponce(res);
 
-                                
-                                foreach (var a in resFiles)
-                                {
-                                    a.text = await fileContentGetter.GetFileContent(a);
-                                    observer.OnNext(a);
-                                }
-
-                            statistics.PrintLanguageStats();
+                            statistics.PrintLanguageStats(context);
 
                         }
                 }
