@@ -15,6 +15,7 @@ namespace ReactiveClient
             using (var observer = new ApiKeyProducer(context))
             //those are the message observer that consume messages
             using (var consumer1 = observer.Subscribe(new FileConsumer(context)))
+            //using (var consumer2 = observer.Subscribe(new FileConsumer(context)))
                 observer.Wait();
 
 

@@ -70,7 +70,7 @@ namespace ReactiveClient
                 statistics.AddLanguage(extension, context);
                 ////////
 
-                Console.WriteLine("Checked file: " + file.name + " Found " + result.Count() + " Keys");
+                DisplayUtils.SendSystemMessage($"Checked file: {file.name} -  Found {result.Count()} Keys", ConsoleColor.Green);
 
                 foreach (var key in result)
                 {

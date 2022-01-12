@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace APIKeyFinder
 {
-    public class ScanResult : Object
+    public class ScanResult
     {
         private int line_num { get; }
         private string line_text { get; }

@@ -54,23 +54,5 @@ namespace ReactiveClient
             }
             Console.ReadKey();
         }
-
-
-        //public Dictionary<string, int> GetFileLanguageStats(string filename)
-        //{
-        //    string file_ext = filename.Split(".").Last();
-
-        //    if (ExtensionStats.ContainsKey(file_ext))  
-        //    {
-        //        int value = ExtensionStats[file_ext];
-        //        ExtensionStats[file_ext] = value + 1;
-        //    }
-        //    else
-        //    {
-        //        ExtensionStats.Add(file_ext, 1);     
-        //    }
-        //    return ExtensionStats;
-        //}
-
     }
 }
