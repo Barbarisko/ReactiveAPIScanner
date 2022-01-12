@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DAL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class ApiKeyProducer : IObservable<RequestLib.File>, IDisposable
+    public class ApiKeyProducer : IObservable<File>, IDisposable
     {
         //the subscriber list
-        private readonly List<IObserver<RequestLib.File>> subscriberList = new List<IObserver<RequestLib.File>>();
+        private readonly List<IObserver<File>> subscriberList = new List<IObserver<File>>();
 
         //the cancellation token source for starting stopping
         //inner observable working thread
@@ -22,14 +23,17 @@ namespace ReactiveClient
         //the running task that runs the inner running thread
         private readonly Task workerTask;
 
-        public ApiKeyProducer()
+        ReactiveDBContext context;
+
+        public ApiKeyProducer(ReactiveDBContext context)
         {
             cancellationSource = new CancellationTokenSource();
             cancellationToken = cancellationSource.Token;
             workerTask = Task.Factory.StartNew(OnInnerWorker, cancellationToken);
+            this.context = context;
         }
         //add another observer to the subscriber list
-        public IDisposable Subscribe(IObserver<RequestLib.File> observer)
+        public IDisposable Subscribe(IObserver<File> observer)
         {
             if (subscriberList.Contains(observer))
                 throw new ArgumentException("The observer is already subscribed to this observable");
@@ -68,9 +72,7 @@ namespace ReactiveClient
                             {
                                 var res = await g.SearchRepositories(input);
                                 var resFiles = g.ParseSearchResponce(res);
-                                //var file = resFiles[0];
-                                //file.text = await fileContentGetter.GetFileContent(file);
-                                //observer.OnNext(file);
+
                                 foreach (var a in resFiles)
                                 {
                                     a.text = await fileContentGetter.GetFileContent(a);
@@ -80,7 +82,7 @@ namespace ReactiveClient
                     }
                     cancellationToken.ThrowIfCancellationRequested();
                 }
-                catch (OperationCanceledException e)
+                catch (OperationCanceledException)
                 {
                     Console.WriteLine($"Task ended, no more files to search.");
 

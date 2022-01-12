@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DAL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace ReactiveClient
 {
-    public class FileConsumer : IObserver<RequestLib.File>
+    public class FileConsumer : IObserver<File>
     {
         APIKeyFinder.PythonCaller fileProcessor;
-        public FileConsumer()
+        ReactiveDBContext context;
+        public FileConsumer(ReactiveDBContext context)
         {
             fileProcessor = new APIKeyFinder.PythonCaller();
+            this.context = context;
         }
 
         private bool finished = false;
@@ -31,7 +34,7 @@ namespace ReactiveClient
             Console.WriteLine("{0}: {1}", GetHashCode(), error.Message);
         }
 
-        public void OnNext(RequestLib.File file)
+        public void OnNext(File file)
         {
             if (finished)
                 OnError(new Exception("This consumer finished its lifecycle"));
@@ -53,6 +56,11 @@ namespace ReactiveClient
             }
             else
             {
+                file.containsKey = true;
+
+                context.Files.Add(file);
+                context.SaveChanges();
+
                 Console.WriteLine("Checked file: " + file.name + " Found " + result.Count() + " Keys");
                 foreach(var key in result)
                 {

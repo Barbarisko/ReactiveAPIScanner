@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Text;
+using DAL;
 
 namespace RequestLib
 {
