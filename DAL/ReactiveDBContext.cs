@@ -10,6 +10,8 @@ namespace DAL
     public class ReactiveDBContext : DbContext
     { 
         public DbSet<File> Files { get; set; }
+        public DbSet<SearchResults> Results { get; set; }
+        public DbSet<Key> Keys { get; set; }
 
         public ReactiveDBContext() : base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ReactiveDB;Integrated Security=True")
         { 
