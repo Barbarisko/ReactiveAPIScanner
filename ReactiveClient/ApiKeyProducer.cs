@@ -75,54 +75,34 @@ namespace ReactiveClient
                         else
                         {
                             var res = await g.SearchRepositories(input);
-                            var resFiles = g.ParseSearchResponce(res);
-                        foreach (var observer in subscriberList)
-                            if (string.IsNullOrEmpty(input))
-                                break;
-                            else if (input.Equals("EXIT"))
-                            {
-                                cancellationSource.Cancel();
-                                break;
-                            }
-                            else
-                            {
-                                var res = await g.SearchRepositories(input);
-                                var resFiles = g.ParseSearchResponce(input, res);
-
+                            var resFiles = g.ParseSearchResponce(input, res);
+                            
                             foreach (var a in resFiles)
                             {
                                 a.text = await fileContentGetter.GetFileContent(a);
-                                observer.OnNext(a);
                             }
 
-                            statistics.PrintLanguageStats(context);
+                            var filteredFiles = fileComparer.GetNewContent(resFiles);
+
+                            PreviousResults(input);
+
+                            Console.WriteLine("\nNew results:\n");
+
+                            if (filteredFiles.Count() > 0)
+                            {
+                                foreach (var a in filteredFiles)
+                                {
+                                    observer.OnNext(a);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("No new results.\n");
+                            }
+
+                            statistics.PrintLanguageStats(context);                                                       
 
                         }
-                }
-                                foreach (var a in resFiles)
-                                {
-                                    a.text = await fileContentGetter.GetFileContent(a);
-                                }
-
-                                var filteredFiles = fileComparer.GetNewContent(resFiles);
-
-                                PreviousResults(input);
-
-                                Console.WriteLine("\nNew results:\n");
-
-                                if (filteredFiles.Count() > 0)
-								{
-                                    foreach (var a in filteredFiles)
-                                    {
-                                        observer.OnNext(a);
-                                    }
-                                }
-                                else
-								{
-                                    Console.WriteLine("No new results.\n");
-								}
-
-                            }
                     }
                     cancellationToken.ThrowIfCancellationRequested();
                 }
@@ -137,12 +117,9 @@ namespace ReactiveClient
                     Console.ReadKey();
                 }
             //}
-            
-            
-            }
-            
-            
+                     
         }
+            
 
         public void PreviousResults(string keyword)
 		{
