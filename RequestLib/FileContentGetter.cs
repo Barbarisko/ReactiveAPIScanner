@@ -8,28 +8,29 @@ using System.Threading.Tasks;
 
 namespace RequestLib
 {
-	public class FileContentGetter : Requester
-	{
-		public FileContentGetter() : base()
-		{
-		}
+    public class FileContentGetter : Requester
+    {
+        public FileContentGetter() : base()
+        {
+        }
 
-		public async Task<string> GetFileContent(File path)
-		{
-			string text = "";
+        public async Task<string> GetFileContent(File path)
+        {
+            string text = "";
 
-			try
+            try
             {
-				string url = "https://raw.githubusercontent.com/" + path.full_repo_name + "/master/" + path.path_to_file;
-				var stringTask = client.GetStringAsync(url);
+                string url = "https://raw.githubusercontent.com/" + path.full_repo_name + "/master/" + path.path_to_file;
+                var stringTask = client.GetStringAsync(url);
 
-				text = await stringTask;
-			}
-			catch(Exception e)
-            {
-				Console.WriteLine(e.Message);
+                text = await stringTask;
             }
-			return text;
-		}
-	}
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return text;
+        }
+        
+    }
 }

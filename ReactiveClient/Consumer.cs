@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,9 +10,11 @@ namespace ReactiveClient
     public class FileConsumer : IObserver<RequestLib.File>
     {
         APIKeyFinder.PythonCaller fileProcessor;
+        StatisticsUtils statistics; 
         public FileConsumer()
         {
             fileProcessor = new APIKeyFinder.PythonCaller();
+            statistics = StatisticsUtils.getInstance();
         }
 
         private bool finished = false;
@@ -22,6 +25,7 @@ namespace ReactiveClient
             else
             {
                 finished = true;
+                statistics.PrintLanguageStats();
                 Console.WriteLine("{0}: END", GetHashCode());
             }
         }
@@ -53,12 +57,15 @@ namespace ReactiveClient
             }
             else
             {
+                statistics.GetFileLanguageStats(file.name);
                 Console.WriteLine("Checked file: " + file.name + " Found " + result.Count() + " Keys");
-                foreach(var key in result)
+
+                foreach (var key in result)
                 {
                     Console.WriteLine(key.ToString());
                 }
+
             }
-        }    
+        }
     }
 }

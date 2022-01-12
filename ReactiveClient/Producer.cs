@@ -21,12 +21,14 @@ namespace ReactiveClient
 
         //the running task that runs the inner running thread
         private readonly Task workerTask;
+        StatisticsUtils statistics; 
 
         public ApiKeyProducer()
         {
             cancellationSource = new CancellationTokenSource();
             cancellationToken = cancellationSource.Token;
             workerTask = Task.Factory.StartNew(OnInnerWorker, cancellationToken);
+            statistics = StatisticsUtils.getInstance();
         }
         //add another observer to the subscriber list
         public IDisposable Subscribe(IObserver<RequestLib.File> observer)
@@ -47,13 +49,13 @@ namespace ReactiveClient
         {
             var fileContentGetter = new RequestLib.FileContentGetter();
             var g = new RequestLib.KeyWordSearcher();
-            while (true)
-            {
-
+            //while (true)
+            //{
                 try
                 {
                     while (!cancellationToken.IsCancellationRequested)
-                    { 
+                    {
+                        Console.WriteLine("Please specify the keyword for search: ");
                         var input = Console.ReadLine();
 
                         foreach (var observer in subscriberList)
@@ -68,25 +70,30 @@ namespace ReactiveClient
                             {
                                 var res = await g.SearchRepositories(input);
                                 var resFiles = g.ParseSearchResponce(res);
-                                //var file = resFiles[0];
-                                //file.text = await fileContentGetter.GetFileContent(file);
-                                //observer.OnNext(file);
+                                
                                 foreach (var a in resFiles)
                                 {
                                     a.text = await fileContentGetter.GetFileContent(a);
                                     observer.OnNext(a);
                                 }
-                            }
-                    }
+
+                            statistics.PrintLanguageStats();
+
+                        }
+                }
                     cancellationToken.ThrowIfCancellationRequested();
+                }
+                catch (OperationCanceledException e)
+                {
+                    Console.WriteLine($"Task ended, no more files to search.");
+                    Console.ReadKey();
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Task ended, no more files to search.");
-
+                    Console.WriteLine($"\n{e.Message}");
                     Console.ReadKey();
                 }
-            }
+            //}
             
             
         }
