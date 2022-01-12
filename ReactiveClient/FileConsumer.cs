@@ -14,6 +14,7 @@ namespace ReactiveClient
         ReactiveDBContext context;
         StatisticsUtils statistics; 
 
+
         public FileConsumer(ReactiveDBContext context)
         {
             fileProcessor = new APIKeyFinder.PythonCaller();
@@ -61,8 +62,8 @@ namespace ReactiveClient
             }
             else
             {
-                file.containsKey = true;
-                context.Files.Add(file);
+                var fileToUpdate = context.Files.Find(file.id);
+                fileToUpdate.containsKey = true;
                 context.SaveChanges();
 
                 ///// part for stats
@@ -72,10 +73,18 @@ namespace ReactiveClient
 
                 DisplayUtils.SendSystemMessage($"Checked file: {file.name} -  Found {result.Count()} Keys", ConsoleColor.Green);
 
-                foreach (var key in result)
+                List<Key> results = new List<Key>();
+
+                
+                foreach(var key in result)
                 {
+                    results.Add(new Key() { KeyString = key.ToString()});
                     Console.WriteLine(key.ToString());
                 }
+                                
+                context.Results.Add(new SearchResults() { FileName = file.name, NumOfKeys = result.Count(), 
+                    SearchResult = new List<Key>(results), KeyWord = file.keyword });
+                context.SaveChanges();
             }
         }
     }

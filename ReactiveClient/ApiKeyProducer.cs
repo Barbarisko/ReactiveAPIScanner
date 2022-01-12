@@ -48,7 +48,9 @@ namespace ReactiveClient
         //message handler
         private async void OnInnerWorker()
         {
+
             var fileContentGetter = new RequestLib.FileContentGetter();
+            var fileComparer = new FileComparer(context);
             var g = new RequestLib.KeyWordSearcher();
 
             DisplayUtils.SendSystemMessage("If you need to exit, type EXIT. " +
@@ -71,12 +73,29 @@ namespace ReactiveClient
                         else
                         {
                             var res = await g.SearchRepositories(input);
-                            var resFiles = g.ParseSearchResponce(res);
-
+                            var resFiles = g.ParseSearchResponce(input, res);
+                            
                             foreach (var a in resFiles)
                             {
                                 a.text = await fileContentGetter.GetFileContent(a);
-                                observer.OnNext(a);
+                            }
+
+                            var filteredFiles = fileComparer.GetNewContent(resFiles);
+
+                            PreviousResults(input);
+
+                            Console.WriteLine("\nNew results:\n");
+
+                            if (filteredFiles.Count() > 0)
+                            {
+                                foreach (var a in filteredFiles)
+                                {
+                                    observer.OnNext(a);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("No new results.\n");
                             }
 
                             statistics.PrintLanguageStats(context);
@@ -92,8 +111,40 @@ namespace ReactiveClient
 
                     Console.ReadKey();
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"\n{e.Message}");
+                    Console.ReadKey();
+                }
+            //}
+                     
+        }
+            
+
+        public void PreviousResults(string keyword)
+		{
+            Console.WriteLine("\nPreviously found results by this keyword:\n");
+
+            List<SearchResults> previousResults = context.Results
+                    .Where(f => f.KeyWord == keyword).ToList();
+
+            if (previousResults.Count() > 0)
+			{
+                foreach (var p in previousResults)
+                {
+                    Console.WriteLine("Checked file: " + p.FileName + " Found " + p.NumOfKeys + " Keys");
+					foreach (var key in p.SearchResult)
+					{
+						Console.WriteLine(key.KeyString);
+					}
+				}
             }
-        }                
+			else
+			{
+                Console.WriteLine("No previous results.");
+            }
+        }
+
         //cancel main task and ack all observers
         //by sending the OnCompleted message
         public void Dispose()

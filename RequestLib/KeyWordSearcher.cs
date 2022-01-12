@@ -13,9 +13,9 @@ namespace RequestLib
 {
     public class KeyWordSearcher : Requester
     {
-
         public KeyWordSearcher() : base()
         {
+            
         }
 
         
@@ -30,7 +30,7 @@ namespace RequestLib
             return msg;
         }
 
-        public List<File> ParseSearchResponce(string msg)
+        public List<File> ParseSearchResponce(string search_keyword, string msg)
 		{
             var resList = new List<File>();
             dynamic results = JObject.Parse(msg);
@@ -40,7 +40,7 @@ namespace RequestLib
                 string fname = m.repository.full_name;
                 string path = m.path;
                 string name = m.name;
-                resList.Add(new File(fname, path, name));
+                resList.Add(new File(search_keyword, fname, path, name));
             }
 
             return resList;
